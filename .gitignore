@@ -22,7 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
+<<<<<<< HEAD
 
 gitText.txt
 
+=======
+>>>>>>> 36eb0881610759dce2e091ce8479672d6942938b
