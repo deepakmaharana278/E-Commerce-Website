@@ -4,12 +4,14 @@ import Layout from '../../components/Layout/Layout'
 import toast from "react-hot-toast";
 import axios from "axios";
 import { Select } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
-const {Option} = Select
 
-const CreateProduct = () => {
-  const navigate= useNavigate()
+const { Option } = Select
+
+const UpdateProduct = () => {
+    const navigate = useNavigate()
+    const params = useParams();
   const [categories, setCategories] = useState([])
   const [name,setName] = useState("")
   const [description,setDescription] = useState("")
@@ -18,7 +20,28 @@ const CreateProduct = () => {
   const [quantity,setQuantity] = useState("")
   const [shipping,setShipping] = useState("")
   const [photo,setPhoto] = useState("")
-  
+  const [id,setId] = useState("")
+    
+    // get single product
+    const getSingleProduct = async () => {
+        try {
+            const { data } = await axios.get(`/api/v1/product/get-product/${ params.slug }`)
+            setName(data.product.name);
+            setId(data.product._id);
+            setDescription(data.product.description);
+            setPrice(data.product.price);
+            setQuantity(data.product.quantity);
+            setShipping(data.product.shipping);
+            setCategory(data.product.category._id);
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    useEffect(() => {
+      getSingleProduct()
+    }, [])
+    
+    
 // get all category
   const getAllCategory = async () => {
     try {
@@ -36,8 +59,8 @@ const CreateProduct = () => {
     }, []);
 
   
-  // create product
-  const handelCreate = async (e) => {
+  // update product
+  const handelUpdate = async (e) => {
     e.preventDefault()
     try {
       const productData = new FormData()
@@ -45,13 +68,13 @@ const CreateProduct = () => {
       productData.append("description",description)
       productData.append("price",price)
       productData.append("quantity",quantity)
-      productData.append("photo",photo)
+      photo && productData.append("photo",photo)
       productData.append("category",category)
-      const { data } =await axios.post('/api/v1/product/create-product', productData)
+      const { data } =await axios.put(`/api/v1/product/update-product/${id}`, productData)
       if (data?.success) {
-        toast.success('Product Created Successfully')
-        navigate('/dashboard/admin/products')
-      } else {
+          toast.success('Product Updated Successfully')
+          navigate('/dashboard/admin/products')
+    } else {
         toast.error(data?.message)
       }
     } catch (error) {
@@ -59,20 +82,19 @@ const CreateProduct = () => {
       toast.error("Something went wrong")
     }
   }
-
   return (
-      
-          <Layout>
+      <Layout>
       <div className="container mx-auto p-6">
         <div className="flex gap-8">
           <div className="w-64">
             <AdminMenu />
           </div>
           <div className="flex-1">
-            <h1 className='font-extrabold'>Create Product</h1>
+            <h1 className='font-extrabold'>Update Product</h1>
             <div className="m-1 w-3/4">
               <Select bordered={false} placeholder="Select a category" size='large' showSearch className='block w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3' 
               onChange={(value) =>{setCategory(value)}}
+              value={category}
               >
                 {categories?.map(c => (
                   <Option key={c._id} value={c._id}>{c.name}</Option>
@@ -89,9 +111,13 @@ const CreateProduct = () => {
                 </label>
               </div>
               <div className="mb-3">
-                {photo && (
+                {photo ? (
                   <div className='text-center'>
                     <img src={URL.createObjectURL(photo)} alt="product_photo" height={'200px'} className='h-auto max-w-full'/>
+                  </div>
+                ) : (
+                    <div className='text-center'>
+                    <img src={`/api/v1/product/product-photo/${id}`} alt="product_photo" height={'200px'} className='h-auto max-w-full'/>
                   </div>
                 )}
               </div>
@@ -131,21 +157,22 @@ const CreateProduct = () => {
                   onChange={(value) => {
                     setShipping(value);
                   }}
+                  value={ shipping? "Yes" : "No" }
+                  
                 >
                   <Option value="0">No</Option>
                   <Option value="1">Yes</Option>
                 </Select>
               </div>
               <div className="mb-3">
-                <button className='bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded' onClick={handelCreate}>Create Product</button>
+                <button className='bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded' onClick={handelUpdate}>Update Product</button>
               </div>
             </div>
           </div>
         </div>
       </div>
     </Layout>
-
   )
 }
 
-export default CreateProduct
+export default UpdateProduct

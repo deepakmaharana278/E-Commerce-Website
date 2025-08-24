@@ -4,22 +4,25 @@ import slugify from "slugify";
 
 export const createProductController = async (req, res) => {
   try {
-    const { name, slug, description, price, category, quantity, shipping } = req.fields;
+    const { name, description, price, category, quantity, shipping } = req.fields;
     const { photo } = req.files;
+
     // validation
     switch (true) {
       case !name:
-        return res.status(500).send({ error: "Name is Required" });
+        return res.status(400).send({ error: "Name is Required" });
       case !description:
-        return res.status(500).send({ error: "Description is Required" });
+        return res.status(400).send({ error: "Description is Required" });
       case !price:
-        return res.status(500).send({ error: "Price is Required" });
+        return res.status(400).send({ error: "Price is Required" });
       case !category:
-        return res.status(500).send({ error: "Category is Required" });
+        return res.status(400).send({ error: "Category is Required" });
       case !quantity:
-        return res.status(500).send({ error: "Quantity is Required" });
-      case !photo && photo.size > 1000000:
-        return res.status(500).send({ error: "photo is required and should be less than 1mb" });
+        return res.status(400).send({ error: "Quantity is Required" });
+      case !photo:
+        return res.status(400).send({ error: "Photo is Required" });
+      case photo && photo.size > 1000000:
+        return res.status(400).send({ error: "Photo should be less than 1mb" });
     }
 
     const products = new productModel({ ...req.fields, slug: slugify(name) });
@@ -27,6 +30,7 @@ export const createProductController = async (req, res) => {
       products.photo.data = fs.readFileSync(photo.path);
       products.photo.contentType = photo.type;
     }
+
     await products.save();
     res.status(201).send({
       success: true,
@@ -42,6 +46,7 @@ export const createProductController = async (req, res) => {
     });
   }
 };
+
 
 // get all product
 export const getProductController = async (req, res) => {
@@ -123,6 +128,7 @@ export const updateProductController = async (req, res) => {
   try {
     const { name, slug, description, price, category, quantity, shipping } = req.fields;
     const { photo } = req.files;
+    // return { name, slug, description, price, category, quantity, shipping, photo };
     // validation
     switch (true) {
       case !name:
@@ -135,7 +141,7 @@ export const updateProductController = async (req, res) => {
         return res.status(500).send({ error: "Category is Required" });
       case !quantity:
         return res.status(500).send({ error: "Quantity is Required" });
-      case !photo && photo.size > 1000000:
+      case photo && photo.size > 1000000:
         return res.status(500).send({ error: "photo is required and should be less than 1mb" });
     }
 
