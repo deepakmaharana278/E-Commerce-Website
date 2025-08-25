@@ -82,6 +82,22 @@ const UpdateProduct = () => {
       toast.error("Something went wrong")
     }
   }
+
+  // delete product
+  const handelDelete = async () => {
+    try {
+      let answer = window.prompt("Are you sure want to delete this product ?")
+      if (!answer) return;
+      const { data } = await axios.delete(`/api/v1/product/delete-product/${ id }`)
+      toast.success("Product Deleted Successfully")
+      navigate('/dashboard/admin/products')
+    } catch (error) {
+      console.log(error);
+      toast.error('Something went wrong')
+    }
+  }
+  
+
   return (
       <Layout>
       <div className="container mx-auto p-6">
@@ -166,6 +182,9 @@ const UpdateProduct = () => {
               </div>
               <div className="mb-3">
                 <button className='bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded' onClick={handelUpdate}>Update Product</button>
+              </div>
+              <div className="mb-3">
+                <button className='bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded' onClick={handelDelete}>Delete Product</button>
               </div>
             </div>
           </div>
