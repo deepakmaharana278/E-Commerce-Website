@@ -38,6 +38,7 @@ const HomePage = () => {
     }
   }
 
+  
   // filter by category
   const handleFilter = (value, id) => {
     let all = [...checked]
