@@ -3,6 +3,7 @@ import Layout from "../components/Layout/Layout";
 import axios from "axios";
 import { Checkbox, Radio } from "antd";
 import { Prices } from "../components/Prices";
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
   const [products, setProducts] = useState([]);
@@ -12,6 +13,8 @@ const HomePage = () => {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate()
+
 
   // get all category
   const getAllCategory = async () => {
@@ -33,7 +36,7 @@ const HomePage = () => {
   const getAllProducts = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get(`/api/v1/product/product-list/${page}`);
+      const { data } = await axios.get(`/api/v1/product/product-list/${ page }`);
       setLoading(false);
       setProducts(data.products);
     } catch (error) {
@@ -59,7 +62,7 @@ const HomePage = () => {
   // load more
   const loadMore = async () => {
     try {
-      const { data } = await axios.get(`/api/v1/product/product-list/${page}`);
+      const { data } = await axios.get(`/api/v1/product/product-list/${ page }`);
       setLoading(false);
       setProducts([...products, ...data?.products]);
     } catch (error) {
@@ -130,14 +133,22 @@ const HomePage = () => {
           <h1 className="text-center font-extrabold text-3xl mb-10">All Products</h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {products.map((product) => (
-              <div key={product._id} className="bg-white shadow rounded-lg overflow-hidden flex flex-col">
-                <img src={`/api/v1/product/product-photo/${product._id}`} alt={product.name} className="h-48 w-full object-cover" />
+              <div
+                key={product._id}
+                className="bg-white shadow rounded-lg overflow-hidden flex flex-col">
+                <img
+                  src={`/api/v1/product/product-photo/${ product._id }`}
+                  alt={product.name}
+                  className="h-48 w-full object-cover" />
                 <div className="p-4 flex flex-col flex-1">
                   <h2 className="text-base font-semibold text-gray-800 mb-1">{product.name}</h2>
                   <p className="text-gray-600 mb-2">{product.description.substring(0, 60)}...</p>
                   <p className="text-gray-600 mb-4 font-semibold">${Number(product.price).toFixed(2)}</p>
-                  <button className="bg-black hover:bg-gray-900 text-white font-semibold py-2 px-4 rounded w-full mt-auto transition">View Details</button>
-                  <button className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded w-full mt-2">Add To Cart</button>
+                  <button
+                    className="bg-black hover:bg-gray-900 text-white font-semibold py-2 px-4 rounded w-full mt-auto transition"
+                    onClick={() => navigate(`/product/${ product.slug }`)}>View Details</button>
+                  <button
+                    className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded w-full mt-2">Add To Cart</button>
                 </div>
               </div>
             ))}

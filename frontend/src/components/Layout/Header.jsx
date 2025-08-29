@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import { Bars3Icon, XMarkIcon, ShoppingCartIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "../../context/auth";
 import toast from "react-hot-toast";
+import SearchInput from "../Form/SearchInput";
 
 const Header = () => {
   const [auth, setAuth] = useAuth();
@@ -44,6 +45,7 @@ const Header = () => {
 
         {/* Desktop Links */}
         <ul className="hidden sm:flex items-center gap-6 text-gray-300 text-sm">
+          <SearchInput/>
           <li>
             <NavLink to="/" className={({ isActive }) => (isActive ? activeClass : inactiveClass)}>
               HOME
