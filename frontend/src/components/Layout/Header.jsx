@@ -9,10 +9,14 @@ import { useAuth } from "../../context/auth";
 import toast from "react-hot-toast";
 import SearchInput from "../Form/SearchInput";
 import useCategory from "../../hooks/useCategory";
+import { useCart } from "../../context/cart";
+import { Badge } from "antd"
+
 
 const Header = () => {
   const [auth, setAuth] = useAuth();
   const categories = useCategory();
+  const [cart] = useCart()
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
@@ -75,61 +79,61 @@ const Header = () => {
             </NavLink>
           </li>
 
-          
-          {/* Category Dropdown */}
-<li className="relative" ref={categoryRef}>
-  <button
-    onClick={() => setCategoryDropdownOpen((prev) => !prev)}
-    className="flex items-center px-3 py-2 font-medium hover:bg-gray-800 rounded transition focus:outline-none focus:ring-2 focus:ring-gray-300"
-    type="button"
-    aria-haspopup="true"
-    aria-expanded={categoryDropdownOpen}
-  >
-    CATEGORY
-    <svg
-      className="w-4 h-4 ml-1 text-gray-400"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M19 9l-7 7-7-7"
-      />
-    </svg>
-  </button>
 
-  {categoryDropdownOpen && (
-    <ul className="absolute left-0 mt-2 w-44 bg-gray-700 py-2 rounded shadow-lg z-50 min-w-max">
-      {/* All Categories link */}
-      <li>
-        <NavLink
-          to="/categories"
-          onClick={() => setCategoryDropdownOpen(false)}
-          className="block px-4 py-2 text-sm font-medium text-white hover:bg-gray-600  whitespace-nowrap"
-        >
-          All Categories
-        </NavLink>
-      </li>
-      <hr className="my-1 border-gray-500" />
-      {/* Dynamic Categories */}
-      {categories?.map((c) => (
-        <li key={c._id}>
-          <NavLink
-            to={`/category/${c.slug}`}
-            onClick={() => setCategoryDropdownOpen(false)}
-            className="block px-4 py-2 text-sm text-white hover:bg-gray-600 whitespace-nowrap"
-          >
-            {c.name}
-          </NavLink>
-        </li>
-      ))}
-    </ul>
-  )}
-</li>
+          {/* Category Dropdown */}
+          <li className="relative" ref={categoryRef}>
+            <button
+              onClick={() => setCategoryDropdownOpen((prev) => !prev)}
+              className="flex items-center px-3 py-2 font-medium hover:bg-gray-800 rounded transition focus:outline-none focus:ring-2 focus:ring-gray-300"
+              type="button"
+              aria-haspopup="true"
+              aria-expanded={categoryDropdownOpen}
+            >
+              CATEGORY
+              <svg
+                className="w-4 h-4 ml-1 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+
+            {categoryDropdownOpen && (
+              <ul className="absolute left-0 mt-2 w-44 bg-gray-700 py-2 rounded shadow-lg z-50 min-w-max">
+                {/* All Categories link */}
+                <li>
+                  <NavLink
+                    to="/categories"
+                    onClick={() => setCategoryDropdownOpen(false)}
+                    className="block px-4 py-2 text-sm font-medium text-white hover:bg-gray-600  whitespace-nowrap"
+                  >
+                    All Categories
+                  </NavLink>
+                </li>
+                <hr className="my-1 border-gray-500" />
+                {/* Dynamic Categories */}
+                {categories?.map((c) => (
+                  <li key={c._id}>
+                    <NavLink
+                      to={`/category/${ c.slug }`}
+                      onClick={() => setCategoryDropdownOpen(false)}
+                      className="block px-4 py-2 text-sm text-white hover:bg-gray-600 whitespace-nowrap"
+                    >
+                      {c.name}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
 
 
           {!auth.user ? (
@@ -187,9 +191,8 @@ const Header = () => {
                   <ul className="absolute right-0 mt-2 w-32 bg-slate-700 py-2 rounded shadow-lg z-50 min-w-max">
                     <li>
                       <NavLink
-                        to={`/dashboard/${
-                          auth?.user?.role === 1 ? "admin" : "user"
-                        }`}
+                        to={`/dashboard/${ auth?.user?.role === 1 ? "admin" : "user"
+                          }`}
                         onClick={() => setUserDropdownOpen(false)}
                         className="block px-4 py-2 text-sm text-white hover:bg-gray-600 whitespace-nowrap"
                       >
@@ -211,14 +214,17 @@ const Header = () => {
           )}
 
           <li>
-            <NavLink
-              to="/cart"
-              className={({ isActive }) =>
-                isActive ? activeClass : inactiveClass
-              }
-            >
-              CART&nbsp;<span className="text-gray-400">(0)</span>
-            </NavLink>
+            <Badge size="small" offset={[10,1]} count={cart?.length} showZero>
+
+              <NavLink
+                to="/cart"
+                className={({ isActive }) =>
+                  isActive ? activeClass : inactiveClass
+                }
+              >
+                <span className="text-gray-300 font-semibold hover:text-gray-500">CART</span>
+              </NavLink>
+            </Badge>
           </li>
         </ul>
 
@@ -238,9 +244,8 @@ const Header = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`sm:hidden bg-white border-t border-gray-200 overflow-hidden transition-all duration-300 ease-in-out ${
-          menuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-        }`}
+        className={`sm:hidden bg-white border-t border-gray-200 overflow-hidden transition-all duration-300 ease-in-out ${ menuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+          }`}
       >
         <div className="px-4 py-3 space-y-3">
           <NavLink
@@ -262,7 +267,7 @@ const Header = () => {
               {categories?.map((c) => (
                 <li key={c._id}>
                   <NavLink
-                    to={`/category/${c.slug}`}
+                    to={`/category/${ c.slug }`}
                     className={({ isActive }) =>
                       (isActive ? activeClass : inactiveClass) + " block"
                     }
@@ -299,9 +304,8 @@ const Header = () => {
           ) : (
             <>
               <NavLink
-                to={`/dashboard/${
-                  auth?.user?.role === 1 ? "admin" : "user"
-                }`}
+                to={`/dashboard/${ auth?.user?.role === 1 ? "admin" : "user"
+                  }`}
                 className={({ isActive }) =>
                   (isActive ? activeClass : inactiveClass) + " block"
                 }
@@ -328,7 +332,7 @@ const Header = () => {
             }
             onClick={() => setMenuOpen(false)}
           >
-            CART&nbsp;<span className="text-gray-400">(0)</span>
+            CART&nbsp;<span className="text-gray-400">({cart?.length})</span>
           </NavLink>
         </div>
       </div>

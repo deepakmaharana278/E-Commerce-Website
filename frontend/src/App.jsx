@@ -8,7 +8,6 @@ import Pagenotfound from "./pages/Pagenotfound";
 import Register from "./pages/Auth/Register";
 import Login from "./pages/Auth/Login";
 import Category from "./pages/Category";
-import Cart from "./pages/Cart";
 import Dashboard from "./pages/user/Dashboard";
 import PrivateRoute from "./components/Routes/Private";
 import ForgotPassword from "./pages/Auth/ForgotPassword";
@@ -24,6 +23,7 @@ import UpdateProduct from "./pages/Admin/UpdateProduct";
 import Search from "./pages/Search";
 import ProductDetails from "./pages/ProductDetails";
 import CategoryProduct from "./pages/CategoryProduct";
+import CartPage from "./pages/CartPage";
 
 const App = () => {
   return (
@@ -54,7 +54,7 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/categories" element={<Category />} />
         <Route path="/category/:slug" element={<CategoryProduct />} />
-        <Route path="/cart" element={<Cart />} />
+        <Route path="/cart" element={<CartPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/policy" element={<Policy />} />

@@ -2,12 +2,15 @@ import React, { useEffect, useState } from 'react'
 import Layout from '../components/Layout/Layout'
 import axios from 'axios'
 import { useNavigate, useParams } from 'react-router-dom'
+import toast from 'react-hot-toast'
+import { useCart } from '../context/cart'
 
 const ProductDetails = () => {
   const params = useParams()
   const [product, setProduct] = useState({}) 
   const [relatedProducts, setRelatedProducts] = useState([])
   const navigate = useNavigate();
+  const [cart,setCart] = useCart()
 
   // initial product details
   useEffect(() => {
@@ -60,7 +63,12 @@ const ProductDetails = () => {
                 <h6 className="text-lg mb-2"><span className='font-bold'>Price :</span> ${product.price}</h6>
                 <h6 className="text-lg mb-2"><span className='font-bold'>Category :</span> {product.category?.name}</h6>
                 <button
-                    className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded  mt-4">Add To Cart</button>
+                    className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded  mt-4"
+                    onClick={() => {
+                        setCart([...cart, product])
+                        toast.success("Item Added to Cart")
+                      }}
+                  >Add To Cart</button>
               </div>
             </div>
             <div className="mt-10">
@@ -86,7 +94,12 @@ const ProductDetails = () => {
                       View Details
                     </button>
                   <button
-                    className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded w-full mt-2">Add To Cart</button>
+                    className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded w-full mt-2"
+                    onClick={() => {
+                        setCart([...cart, product])
+                        toast.success("Item Added to Cart")
+                      }}
+                  >Add To Cart</button>
                 </div>
               </div>
             ))}
