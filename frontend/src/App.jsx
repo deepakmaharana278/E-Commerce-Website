@@ -23,6 +23,7 @@ import Products from "./pages/Admin/Products";
 import UpdateProduct from "./pages/Admin/UpdateProduct";
 import Search from "./pages/Search";
 import ProductDetails from "./pages/ProductDetails";
+import CategoryProduct from "./pages/CategoryProduct";
 
 const App = () => {
   return (
@@ -51,7 +52,8 @@ const App = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/category" element={<Category />} />
+        <Route path="/categories" element={<Category />} />
+        <Route path="/category/:slug" element={<CategoryProduct />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />

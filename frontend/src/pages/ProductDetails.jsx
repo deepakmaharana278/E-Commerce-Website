@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom'
 const ProductDetails = () => {
   const params = useParams()
   const [product, setProduct] = useState({}) 
+  const [relatedProducts,setRelatedProducts] = useState([])
 
   // initial product details
   useEffect(() => {
@@ -17,8 +18,20 @@ const ProductDetails = () => {
     try {
       const { data } = await axios.get(`/api/v1/product/get-product/${params.slug}`)
       setProduct(data?.product)
+      getSimilarProduct(data?.product._id, data?.product.category._id);
     } catch (error) {
       console.log(error)
+    }
+  }
+
+  // get similar product
+  const getSimilarProduct = async (pid, cid) => {
+    try {
+      const { data } = await axios.get(`/api/v1/product/related-product/${ pid }/${ cid }`)
+      setRelatedProducts(data?.products);
+    } catch (error) {
+      console.log(error);
+      
     }
   }
 
@@ -50,7 +63,28 @@ const ProductDetails = () => {
               </div>
             </div>
             <div className="mt-10">
-              <h2 className="text-xl font-semibold mb-4">Similar Products</h2>
+                <h2 className="text-xl font-semibold mb-4">Similar Products</h2>
+                {relatedProducts.length<1 && (<p>No Similar Products found</p>)}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {relatedProducts.map((product) => (
+              <div
+                key={product._id}
+                className="bg-white shadow rounded-lg overflow-hidden flex flex-col">
+                <img
+                  src={`/api/v1/product/product-photo/${ product._id }`}
+                  alt={product.name}
+                  className="h-48 w-full object-cover" />
+                <div className="p-4 flex flex-col flex-1">
+                  <h2 className="text-base font-semibold text-gray-800 mb-1">{product.name}</h2>
+                  <p className="text-gray-600 mb-2">{product.description.substring(0, 60)}...</p>
+                  <p className="text-gray-600 mb-4 font-semibold">${Number(product.price).toFixed(2)}</p>
+                  
+                  <button
+                    className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded w-full mt-2">Add To Cart</button>
+                </div>
+              </div>
+            ))}
+          </div>
             </div>
           </>
         )}
