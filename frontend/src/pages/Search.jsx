@@ -1,9 +1,11 @@
 import React from "react";
 import Layout from "../components/Layout/Layout";
 import { useSearch } from "../context/search";
+import { useNavigate } from "react-router-dom";
 
 const Search = () => {
   const [values, setValues] = useSearch();
+  const navigate = useNavigate();
 
   return (
     <Layout>
@@ -19,7 +21,9 @@ const Search = () => {
                   <h2 className="text-base font-semibold text-gray-800 mb-1">{product.name}</h2>
                   <p className="text-gray-600 mb-2">{product.description.substring(0, 60)}...</p>
                   <p className="text-gray-600 mb-4 font-semibold">${Number(product.price).toFixed(2)}</p>
-                  <button className="bg-black hover:bg-gray-900 text-white font-semibold py-2 px-4 rounded w-full mt-auto transition">View Details</button>
+                  <button className="bg-black hover:bg-gray-900 text-white font-semibold py-2 px-4 rounded w-full mt-auto transition"
+                  onClick={() => navigate(`/product/${product.slug}`)}
+                  >View Details</button>
                   <button className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded w-full mt-2">Add To Cart</button>
                 </div>
               </div>
