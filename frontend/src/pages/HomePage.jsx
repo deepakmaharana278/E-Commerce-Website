@@ -200,6 +200,7 @@ const HomePage = () => {
                       className="bg-gray-500 hover:bg-gray-600 text-white text-sm sm:text-base font-semibold py-2 px-3 sm:px-4 rounded w-full mt-2"
                       onClick={() => {
                         setCart([...cart, product])
+                        localStorage.setItem('cart',JSON.stringify([...cart,product]))
                         toast.success("Item Added to Cart")
                       }}
                     >
