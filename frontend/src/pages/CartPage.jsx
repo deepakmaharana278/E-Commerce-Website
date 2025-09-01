@@ -1,13 +1,19 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Layout from '../components/Layout/Layout'
 import { useCart } from '../context/cart'
 import { useAuth } from '../context/auth';
 import { useNavigate } from 'react-router-dom';
+import DropIn from "braintree-web-drop-in-react";
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const CartPage = () => {
   const [auth, setAuth] = useAuth();
   const [cart, setCart] = useCart();
-  const navigate = useNavigate()
+  const [clientToken, setClientToken] = useState(null)
+  const [instance, setInstance] = useState(null);
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate();
 
 
   // total price
@@ -40,6 +46,44 @@ const CartPage = () => {
 
     }
   }
+
+  // get payment gateway token
+  const getToken = async () => {
+    try {
+      const { data } = await axios.get("/api/v1/product/braintree/token")
+      setClientToken(data?.clientToken)
+    } catch (error) {
+      console.log(error);
+
+    }
+  }
+  useEffect(() => {
+    getToken()
+  }, [auth?.token])
+
+  // handle payment
+  const handlePayment = async () => {
+    try {
+      setLoading(true)
+      const { nonce } = await instance.requestPaymentMethod()
+      const { data } = await axios.post("/api/v1/product/braintree/payment", {
+        nonce, cart
+      })
+      setLoading(false)
+      localStorage.removeItem("cart")
+      setCart([])
+      if (data?.success) {
+        navigate("/dashboard/user/orders")
+        toast.success("Payment successful");
+      } else {
+        toast.error("Payment failed");
+      }
+    } catch (error) {
+      console.log(error);
+      setLoading(false)
+    }
+  };
+
 
   return (
     <Layout>
@@ -118,16 +162,33 @@ const CartPage = () => {
                       >Update Address</button>
                     ) : (
                       <button className='bg-blue-700 mt-3 rounded-md  text-white font-bold hover:bg-blue-900 py-2 px-3 w-full'
-                            onClick={() => navigate("/login", {
-                              state:"/cart",
-                            })}
-                          >Please login to checkout</button>
+                        onClick={() => navigate("/login", {
+                          state: "/cart",
+                        })}
+                      >Please login to checkout</button>
                     )
                   }
                 </div>
               )}
+              {clientToken && cart?.length > 0 && (
+                <div className="mt-2">
+                  <DropIn
+                    options={{
+                      authorization: clientToken,
+                      paypal: { flow: "checkout" },
+                    }}
+                    onInstance={(instance) => setInstance(instance)}
+                  />
+                  <button
+                    className="bg-blue-700 mt-3 rounded-md text-white font-bold hover:bg-blue-900 py-2 px-3 w-full"
+                    onClick={handlePayment}
+                    disabled={loading || !instance || !auth?.user?.address}
+                  >
+                    {loading ? "Processing..." : "Make Payment"}
+                  </button>
+                </div>
+              )}
             </div>
-            
           </div>
         </div>
       </div>
