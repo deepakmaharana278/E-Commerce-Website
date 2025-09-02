@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from "react";
-import Layout from "../components/Layout/Layout";
-import { useCart } from "../context/cart";
-import { useAuth } from "../context/auth";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import toast from "react-hot-toast";
+import React, { useState } from 'react';
+import Layout from '../components/Layout/Layout';
+import { useCart } from '../context/cart';
+import { useAuth } from '../context/auth';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 import { loadStripe } from "@stripe/stripe-js";
-import { Elements, CardElement, useStripe, useElements, PaymentRequestButtonElement } from "@stripe/react-stripe-js";
+import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
 // Load Stripe with your publishable key
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+
 
 const CartPage = () => {
   const [auth] = useAuth();
@@ -21,7 +22,10 @@ const CartPage = () => {
     try {
       let total = 0;
       cart?.forEach(item => total += item.price);
-      return total.toLocaleString("en-US", { style: "currency", currency: "USD" });
+      return total.toLocaleString("en-US", {
+        style: "currency",
+        currency: "USD"
+      });
     } catch (error) {
       console.log(error);
     }
@@ -34,7 +38,7 @@ const CartPage = () => {
       const index = myCart.findIndex(item => item._id === pid);
       myCart.splice(index, 1);
       setCart(myCart);
-      localStorage.setItem("cart", JSON.stringify(myCart));
+      localStorage.setItem('cart', JSON.stringify(myCart));
     } catch (error) {
       console.log(error);
     }
@@ -93,32 +97,34 @@ const CartPage = () => {
               <h1 className="text-center font-extrabold text-xl mb-4">Cart Summary</h1>
               <div className="flex flex-col items-center gap-2 mb-4">
                 <span className="text-gray-700 font-medium">Total Items: {cart.length}</span>
-                <span className="text-2xl font-bold text-blue-700">Total: {totaPrice()}</span>
+                <span className="text-2xl font-bold text-blue-700">
+                  Total: {totaPrice()}
+                </span>
               </div>
               <hr className="my-3" />
               {auth?.user?.address ? (
-                <div className="mb-3">
-                  <h4 className="text-center">Current Address</h4>
-                  <h5 className="text-center">{auth?.user?.address}</h5>
+                <div className='mb-3'>
+                  <h4 className='text-center'>Current Address</h4>
+                  <h5 className='text-center'>{auth?.user?.address}</h5>
                   <button
-                    className="bg-blue-700 mt-3 rounded-md text-white font-bold hover:bg-blue-900 py-2 px-3 w-full"
+                    className='bg-blue-700 mt-3 rounded-md text-white font-bold hover:bg-blue-900 py-2 px-3 w-full'
                     onClick={() => navigate("/dashboard/user/profile")}
                   >
                     Update Address
                   </button>
                 </div>
               ) : (
-                <div className="mb-3">
+                <div className='mb-3'>
                   {auth?.token ? (
                     <button
-                      className="bg-blue-700 mt-3 rounded-md text-white font-bold hover:bg-blue-900 py-2 px-3 w-full"
+                      className='bg-blue-700 mt-3 rounded-md text-white font-bold hover:bg-blue-900 py-2 px-3 w-full'
                       onClick={() => navigate("/dashboard/user/profile")}
                     >
                       Update Address
                     </button>
                   ) : (
                     <button
-                      className="bg-blue-700 mt-3 rounded-md text-white font-bold hover:bg-blue-900 py-2 px-3 w-full"
+                      className='bg-blue-700 mt-3 rounded-md text-white font-bold hover:bg-blue-900 py-2 px-3 w-full'
                       onClick={() => navigate("/login", { state: "/cart" })}
                     >
                       Please login to checkout
@@ -130,7 +136,7 @@ const CartPage = () => {
               {/* Stripe Payment */}
               {cart?.length > 0 && auth?.user?.address && (
                 <Elements stripe={stripePromise}>
-                  <PaymentForm cart={cart} setCart={setCart} navigate={navigate} auth={auth} />
+                  <PaymentForm cart={cart} setCart={setCart} navigate={navigate} />
                 </Elements>
               )}
             </div>
@@ -143,115 +149,59 @@ const CartPage = () => {
 
 export default CartPage;
 
-// PaymentForm Component with Card + Google Pay / UPI
-const PaymentForm = ({ cart, setCart, navigate, auth }) => {
+// ----------------------
+// PaymentForm Component
+// ----------------------
+const PaymentForm = ({ cart, setCart, navigate }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
-  const [paymentRequest, setPaymentRequest] = useState(null);
-  const [showPRButton, setShowPRButton] = useState(false);
 
-  const totalAmount = cart.reduce((acc, item) => acc + item.price * 100, 0); // in paise
-
-  useEffect(() => {
-    if (!stripe) return;
-
-    const pr = stripe.paymentRequest({
-      country: "IN",
-      currency: "inr",
-      total: { label: "Total", amount: totalAmount },
-      requestPayerName: true,
-      requestPayerEmail: true,
-      requestPayerPhone: true,
-      paymentMethodTypes: ["card", "upi"],
-    });
-
-    pr.canMakePayment().then(result => {
-      if (result) setShowPRButton(true);
-    });
-
-    pr.on("paymentmethod", async (ev) => {
-      setLoading(true);
-      try {
-        const { data } = await axios.post("/api/v1/product/stripe/create-payment-intent", { cart });
-        const clientSecret = data.clientSecret;
-
-        const { error: confirmError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-          payment_method: ev.paymentMethod.id,
-          confirmParams: { return_url: window.location.href },
-        });
-
-        if (confirmError) {
-          toast.error(confirmError.message);
-          ev.complete("fail");
-        } else if (paymentIntent.status === "succeeded") {
-          await axios.post("/api/v1/product/stripe/payment-success", { cart, paymentIntent });
-          localStorage.removeItem("cart");
-          setCart([]);
-          toast.success("Payment successful!");
-          navigate("/dashboard/user/orders");
-          ev.complete("success");
-        }
-      } catch (err) {
-        console.log(err);
-        toast.error("Payment failed. Try again.");
-        ev.complete("fail");
-      } finally {
-        setLoading(false);
-      }
-    });
-
-    setPaymentRequest(pr);
-  }, [stripe, cart]);
-
-  const handleCardPayment = async () => {
-    if (!stripe || !elements) return;
-    setLoading(true);
+  const handlePayment = async () => {
     try {
+      setLoading(true);
       const { data } = await axios.post("/api/v1/product/stripe/create-payment-intent", { cart });
-      const clientSecret = data.clientSecret;
+      const clientSecret = data?.clientSecret;
+
+      if (!clientSecret) {
+        toast.error("Payment failed. Try again.");
+        setLoading(false);
+        return;
+      }
+
       const cardElement = elements.getElement(CardElement);
 
       const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: { card: cardElement, billing_details: { name: auth?.user?.name } },
+        payment_method: { card: cardElement }
       });
 
       if (error) {
         toast.error(error.message);
-      } else if (paymentIntent.status === "succeeded") {
+        setLoading(false);
+      } else if (paymentIntent?.status === "succeeded") {
         await axios.post("/api/v1/product/stripe/payment-success", { cart, paymentIntent });
         localStorage.removeItem("cart");
         setCart([]);
+        setLoading(false);
         toast.success("Payment successful!");
         navigate("/dashboard/user/orders");
       }
-    } catch (err) {
-      console.log(err);
-      toast.error("Payment failed. Try again.");
-    } finally {
+    } catch (error) {
+      console.log(error);
       setLoading(false);
+      toast.error("Payment failed. Try again.");
     }
   };
 
   return (
     <div>
-      {/* PaymentRequestButton (Google Pay / UPI) */}
-      {showPRButton && paymentRequest && (
-        <div className="mb-4">
-          <PaymentRequestButtonElement options={{ paymentRequest }} />
-        </div>
-      )}
-
-      {/* Card Payment Fallback */}
-      <div className="mb-4 border p-2 rounded-md">
-        <CardElement />
-      </div>
+      <CardElement className="p-2 border rounded-md mb-4" />
       <button
         className="bg-green-600 mt-3 rounded-md text-white font-bold hover:bg-green-800 py-2 px-3 w-full"
-        onClick={handleCardPayment}
+        onClick={handlePayment}
         disabled={loading}
       >
-        {loading ? "Processing..." : "Pay with Card / Other Methods"}
+        {loading ? "Processing..." : "Pay with Stripe"}
       </button>
     </div>
   );

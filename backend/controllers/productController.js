@@ -319,13 +319,13 @@ export const createPaymentIntentController = async (req, res) => {
 
     let total = 0;
     cart.forEach(item => {
-      total += item.price * 100; // convert to smallest currency unit (cents/paise)
+      total += item.price * 100; 
     });
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: total,
-      currency: "inr", // or "usd"
-      payment_method_types: ["card", "upi"],
+      currency: "inr",
+      automatic_payment_methods: { enabled: true },
     });
 
     res.status(200).send({
@@ -337,30 +337,23 @@ export const createPaymentIntentController = async (req, res) => {
   }
 };
 
+
 // Payment success
 export const stripePaymentSuccessController = async (req, res) => {
   try {
     const { cart, paymentIntent } = req.body;
 
-    // Save order in DB
+    // save order
     const order = await new orderModel({
       products: cart.map(item => item._id),
       payment: paymentIntent,
-      buyer: req.user._id, // requires user auth
-      status: "Processing",
+      buyer: req.user._id,
+      status: "Processing"
     }).save();
 
-    res.status(200).send({
-      success: true,
-      message: "Order placed successfully",
-      order,
-    });
+    res.status(200).send({ success: true, order });
   } catch (error) {
     console.log(error);
-    res.status(500).send({
-      success: false,
-      error,
-      message: "Error saving order",
-    });
+    res.status(500).send({ success: false, error });
   }
 };
