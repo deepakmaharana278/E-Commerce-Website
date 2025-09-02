@@ -2,19 +2,15 @@ import productModel from "../models/productModel.js";
 import fs from "fs";
 import slugify from "slugify";
 import categoryModel from "../models/categoryModel.js";
-import braintree from "braintree";
 import orderModel from "../models/orderModel.js";
+import Stripe from "stripe";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-//payment gateway
-var gateway = new braintree.BraintreeGateway({
-  environment: braintree.Environment.Sandbox,
-  merchantId: process.env.BRAINTREE_MERCHANT_ID,
-  publicKey: process.env.BRAINTREE_PUBLIC_KEY,
-  privateKey: process.env.BRAINTREE_PRIVATE_KEY,
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+
 
 export const createProductController = async (req, res) => {
   try {
@@ -315,51 +311,56 @@ export const productCategoryController = async (req, res) => {
   }
 };
 
-// payment gateway api
-// token
-export const braintreeTokenController = async (req, res) => {
+
+// Stripe payment controller
+export const createPaymentIntentController = async (req, res) => {
   try {
-    gateway.clientToken.generate({}, function (err, response) {
-      if (err) {
-        res.status(500).send(err);
-      } else {
-        res.send(response);
-      }
+    const { cart } = req.body;
+
+    let total = 0;
+    cart.forEach(item => {
+      total += item.price * 100; // convert to smallest currency unit (cents/paise)
+    });
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: total,
+      currency: "inr", // or "usd"
+      payment_method_types: ["card", "upi"],
+    });
+
+    res.status(200).send({
+      clientSecret: paymentIntent.client_secret,
     });
   } catch (error) {
     console.log(error);
+    res.status(500).send({ error });
   }
 };
 
-// payment
-export const braintreePaymentController = async (req, res) => {
+// Payment success
+export const stripePaymentSuccessController = async (req, res) => {
   try {
-    const { cart, nonce } = req.body;
-    let total = 0;
-    cart.map((i) => {
-      total += i.price
+    const { cart, paymentIntent } = req.body;
+
+    // Save order in DB
+    const order = await new orderModel({
+      products: cart.map(item => item._id),
+      payment: paymentIntent,
+      buyer: req.user._id, // requires user auth
+      status: "Processing",
+    }).save();
+
+    res.status(200).send({
+      success: true,
+      message: "Order placed successfully",
+      order,
     });
-    let newTransaction = gateway.transaction.sale({
-      amount: total,
-      paymentMethodNonce: nonce,
-      options: {
-        submitForSettlement: true
-      }
-    },
-      function (error, result) {
-        if (result) {
-          const order = new orderModel({
-            products: cart,
-            payment: result,
-            buyer: req.user._id
-          }).save()
-          res.json({ success: true })
-        } else {
-          res.status(500).send(error)
-        }
-      }
-    );
   } catch (error) {
     console.log(error);
+    res.status(500).send({
+      success: false,
+      error,
+      message: "Error saving order",
+    });
   }
 };
