@@ -38,6 +38,16 @@ const AdminMenu = () => {
            Products
         </NavLink>
         <NavLink
+          to="/dashboard/admin/orders"
+          className={({ isActive }) =>
+            `block px-4 py-2 rounded hover:bg-blue-100 ${
+              isActive ? "bg-blue-200 font-semibold" : "text-blue-700"
+            }`
+          }
+        >
+           Orders
+        </NavLink>
+        <NavLink
           to="/dashboard/admin/users"
           className={({ isActive }) =>
             `block px-4 py-2 rounded hover:bg-blue-100 ${

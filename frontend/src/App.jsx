@@ -24,6 +24,7 @@ import Search from "./pages/Search";
 import ProductDetails from "./pages/ProductDetails";
 import CategoryProduct from "./pages/CategoryProduct";
 import CartPage from "./pages/CartPage";
+import AdminOrders from "./pages/Admin/AdminOrders";
 
 const App = () => {
   return (
@@ -47,6 +48,7 @@ const App = () => {
           <Route path="product/:slug" element={<UpdateProduct />} />
           <Route path="products" element={<Products />} />
           <Route path="users" element={<Users />} />
+          <Route path="orders" element={<AdminOrders />} />
         </Route>
 
         <Route path="/register" element={<Register />} />
