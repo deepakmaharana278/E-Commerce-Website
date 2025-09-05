@@ -12,34 +12,52 @@ const Search = () => {
 
   return (
     <Layout>
-      <div className="container mx-auto">
-        <div className="text-center">
-          <h1>Search Results</h1>
-          <h6>{values?.results.length < 1 ? "No Products Found" : `Found${values?.results.length}`}</h6>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 mt-4 gap-6">
-            {values?.results.map((product) => (
-              <div key={product._id} className="bg-white shadow rounded-lg overflow-hidden flex flex-col">
-                <img src={`/api/v1/product/product-photo/${product._id}`} alt={product.name} className="h-48 w-full object-cover" />
-                <div className="p-4 flex flex-col flex-1">
-                  <h2 className="text-base font-semibold text-gray-800 mb-1">{product.name}</h2>
-                  <p className="text-gray-600 mb-2">{product.description.substring(0, 60)}...</p>
-                  <p className="text-gray-600 mb-4 font-semibold">${Number(product.price).toFixed(2)}</p>
-                  <button className="bg-black hover:bg-gray-900 text-white font-semibold py-2 px-4 rounded w-full mt-auto transition"
-                  onClick={() => navigate(`/product/${product.slug}`)}
-                  >View Details</button>
-                  <button
-                    className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded w-full mt-2"
-                    onClick={() => {
-                        setCart([...cart, product])
-                        toast.success("Item Added to Cart")
-                      }}
-                  >Add To Cart</button>
-                </div>
-              </div>
-            ))}
-          </div>
+      <div className="container mx-auto px-6 py-10 max-w-7xl">
+  <div className="text-center mb-12">
+    <h1 className="text-4xl font-extrabold text-gray-900 mb-2">Search Results</h1>
+    <h6 className="text-lg text-gray-600">
+      {values?.results.length < 1
+        ? "No Products Found"
+        : `Found ${values?.results.length} product${values?.results.length > 1 ? "s" : ""}`}
+    </h6>
+  </div>
+
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+    {values?.results.map((product) => (
+      <div
+        key={product._id}
+        className="bg-white rounded-3xl shadow-lg overflow-hidden flex flex-col group transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl"
+      >
+        <img
+          src={`/api/v1/product/product-photo/${product._id}`}
+          alt={product.name}
+          className="h-52 w-full object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+        <div className="flex flex-col flex-1 p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-2 truncate">{product.name}</h2>
+          <p className="text-gray-700 mb-4 line-clamp-3">{product.description.substring(0, 100)}...</p>
+          <p className="text-indigo-600 font-bold text-lg mb-6">${Number(product.price).toFixed(2)}</p>
+          <button
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-full w-full shadow transition"
+            onClick={() => navigate(`/product/${product.slug}`)}
+          >
+            View Details
+          </button>
+          <button
+            className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 rounded-full w-full shadow mt-3 transition"
+            onClick={() => {
+              setCart([...cart, product]);
+              toast.success("Item Added to Cart");
+            }}
+          >
+            Add To Cart
+          </button>
         </div>
       </div>
+    ))}
+  </div>
+</div>
+
     </Layout>
   );
 };

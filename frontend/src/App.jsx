@@ -15,7 +15,6 @@ import AdminRoute from "./components/Routes/AdminRoute";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import CreateCategory from "./pages/Admin/CreateCategory";
 import CreateProduct from "./pages/Admin/CreateProduct";
-import Users from "./pages/Admin/Users";
 import Profile from "./pages/user/Profile";
 import Orders from "./pages/user/Orders";
 import Products from "./pages/Admin/Products";
@@ -47,7 +46,6 @@ const App = () => {
           <Route path="create-product" element={<CreateProduct />} />
           <Route path="product/:slug" element={<UpdateProduct />} />
           <Route path="products" element={<Products />} />
-          <Route path="users" element={<Users />} />
           <Route path="orders" element={<AdminOrders />} />
         </Route>
 

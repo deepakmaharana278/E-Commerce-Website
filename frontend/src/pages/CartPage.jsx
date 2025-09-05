@@ -50,11 +50,11 @@ const CartPage = () => {
         {/* User Greeting */}
         <div className="text-center mb-8">
           <h1 className="font-bold text-lg">
-            {`Hello${auth?.token && auth?.user?.name ? ` ${auth.user.name}` : ""}`}
+            {`Hello${ auth?.token && auth?.user?.name ? ` ${ auth.user.name }` : "" }`}
           </h1>
           <p className="font-medium text-gray-700">
             {cart?.length
-              ? `You have ${cart.length} item${cart.length > 1 ? "s" : ""} in your cart${auth?.token ? "" : " (please login to checkout)"}`
+              ? `You have ${ cart.length } item${ cart.length > 1 ? "s" : "" } in your cart${ auth?.token ? "" : " (please login to checkout)" }`
               : "Your cart is empty"}
           </p>
         </div>
@@ -68,7 +68,7 @@ const CartPage = () => {
                 {cart.map((p) => (
                   <div key={p._id} className="flex bg-white shadow rounded-xl overflow-hidden flex-col sm:flex-row items-center gap-6 p-4">
                     <img
-                      src={`/api/v1/product/product-photo/${p._id}`}
+                      src={`/api/v1/product/product-photo/${ p._id }`}
                       alt={p.name}
                       className="h-36 w-36 object-cover rounded-lg"
                     />
@@ -197,12 +197,35 @@ const PaymentForm = ({ cart, setCart, navigate }) => {
     <div>
       <CardElement className="p-2 border rounded-md mb-4" />
       <button
-        className="bg-green-600 mt-3 rounded-md text-white font-bold hover:bg-green-800 py-2 px-3 w-full"
+        className="bg-gradient-to-r from-green-500 to-green-700 mt-4 rounded-lg text-white font-semibold hover:from-green-700 hover:to-green-900 focus:outline-none focus:ring-4 focus:ring-green-300 transition duration-300 ease-in-out py-3 px-6 w-full shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-3 transform hover:scale-105 active:scale-95"
         onClick={handlePayment}
         disabled={loading}
       >
-        {loading ? "Processing..." : "Pay with Stripe"}
+        {loading && (
+          <svg
+            className="animate-spin h-5 w-5 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            ></path>
+          </svg>
+        )}
+        <span>{loading ? "Processing..." : "Pay with Stripe"}</span>
       </button>
+
     </div>
   );
 };
