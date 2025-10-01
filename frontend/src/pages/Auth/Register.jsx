@@ -19,7 +19,7 @@ const Register = () => {
     e.preventDefault();
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_API}/api/v1/auth/register`,
+        `${import.meta.env.VITE_API_URL}/api/v1/auth/register`,
         { name, email, password, phone, address, answer }
       );
       if (res.data && res.data.success) {
