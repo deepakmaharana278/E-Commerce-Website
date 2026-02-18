@@ -29,7 +29,7 @@ const Search = () => {
         className="bg-white rounded-3xl shadow-lg overflow-hidden flex flex-col group transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl"
       >
         <img
-          src={`/api/v1/product/product-photo/${product._id}`}
+          src={product.photo}
           alt={product.name}
           className="h-52 w-full object-cover group-hover:scale-105 transition-transform duration-300"
         />

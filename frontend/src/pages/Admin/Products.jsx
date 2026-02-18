@@ -19,6 +19,7 @@ const Products = () => {
     }
   };
 
+
   // lifecycle method
   useEffect(() => {
     getAllProducts();
@@ -38,7 +39,7 @@ const Products = () => {
                 <Link key={p._id} to={`/dashboard/admin/product/${p.slug}`}>
                   <div className="bg-white shadow rounded-lg overflow-hidden w-72 m-4 flex flex-col">
                     <div className="h-48 w-full overflow-hidden flex items-center justify-center bg-gray-100">
-                      <img src={`/api/v1/product/product-photo/${p._id}`} alt={p.name} className="h-full w-full object-contain" />
+                      <img src={p.photo} alt={p.name} className="h-full w-full object-contain" />
                     </div>
                     <div className="p-4 flex flex-col flex-1">
                       <h2 className="text-lg font-bold mb-1">{p.name}</h2>

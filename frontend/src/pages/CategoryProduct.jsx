@@ -40,7 +40,7 @@ const CategoryProduct = () => {
                   className="bg-white shadow rounded-lg overflow-hidden flex flex-col"
                 >
                   <img
-                    src={`/api/v1/product/product-photo/${product._id}`}
+                    src={product.photo}
                     alt={product.name}
                     className="h-40 sm:h-48 w-full object-cover"
                   />

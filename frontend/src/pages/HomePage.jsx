@@ -215,7 +215,7 @@ const HomePage = () => {
             className="bg-white shadow-2xl rounded-3xl overflow-hidden flex flex-col group transition transform hover:-translate-y-2 hover:shadow-2xl"
           >
             <img
-              src={`/api/v1/product/product-photo/${product._id}`}
+              src={product.photo}
               alt={product.name}
               className="h-56 w-full object-cover group-hover:scale-105 transition"
             />
@@ -223,7 +223,7 @@ const HomePage = () => {
               <h3 className="text-xl font-bold text-gray-900 mb-1 truncate">{product.name}</h3>
               <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description.substring(0, 60)}...</p>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-2xl font-bold text-pink-600">${Number(product.price).toFixed(2)}</span>
+                <span className="text-2xl font-bold text-pink-600">₹{Number(product.price).toFixed(2)}</span>
               </div>
               <button
                 className="mb-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-full w-full shadow transition"
