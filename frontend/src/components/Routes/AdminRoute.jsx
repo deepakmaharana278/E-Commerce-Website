@@ -35,17 +35,22 @@ export default function AdminRoute() {
       try {
         const res = await axios.get("/api/v1/auth/admin-auth");
         setOk(res.data.ok);
-      } catch {
+      } catch (error) {
+        console.log(error);
         setOk(false);
       }
     };
-    if (auth?.token) authCheck();
-    else setOk(false);
+    
+    if (auth?.token) {
+      authCheck();
+    } else {
+      setOk(false);
+    }
   }, [auth?.token]);
 
   if (ok === null) return <Spinner />;
 
-  if (!ok) return <SpinnerRedirect />; // Show spinner + delayed redirect
+  if (!ok) return <SpinnerRedirect />;
 
-  return <Outlet />; // User is authenticated, show dashboard/protected pages
+  return <Outlet />;
 }
