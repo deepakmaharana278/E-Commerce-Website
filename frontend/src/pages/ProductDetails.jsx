@@ -50,7 +50,7 @@ const ProductDetails = () => {
               {/* Product Image */}
               <div className="md:w-1/2 flex justify-center items-center">
                 <img
-                  src={`/api/v1/product/product-photo/${ product._id }`}
+                  src={product.photo}
                   alt={product.name}
                   className="w-full max-w-md rounded-3xl shadow-xl object-cover"
                 />
